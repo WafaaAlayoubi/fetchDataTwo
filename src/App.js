@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useState, useEffect } from 'react'
+import Posts from './components/Posts';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 function App() {
+
+  const [posts, setPosts] = useState([])
+  const [status, setStatus] = useState("loading")
+
+  useEffect(() => {
+    
+    const getPosts = async () => {
+      try{
+
+        const response = await axios.get('https://dummyapi.io/data/v1/user?limit=50',{
+          headers: {
+            'app-id': '613e64e2748b558d779ce190'
+          }
+        });
+        console.log(response.data.data)
+        setPosts(response.data.data);
+        setStatus("idle");     
+
+      }catch(error){
+        console.log(error);
+      }
+    };
+    getPosts();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+  {status === "loading" ?  <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box> : <Posts posts={posts}/>}
+    
+    </>
   );
 }
 
 export default App;
+
